@@ -1,5 +1,5 @@
 class CategorySerializer < ActiveModel::Serializer
-  attributes :title, :sub_categories
+  attributes :title, :sub_categories, :_links
 
   def title
     CGI.escape(object.cat_title.force_encoding('ISO-8859-1')
@@ -8,5 +8,19 @@ class CategorySerializer < ActiveModel::Serializer
 
   def sub_categories
     object.cat_subcats
+  end
+
+  def _links
+    { self: _self, graph: _graph }
+  end
+
+  def _graph
+    href = CGI.escape("api/v1/graph/#{self.title}")
+    {href: href, method: :GET, rel: 'graph'}
+  end
+
+  def _self
+    href = CGI.escape("api/v1/category/#{self.title}")
+    {href: href, method: :GET, rel: 'self'}
   end
 end
